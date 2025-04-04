@@ -1,0 +1,38 @@
+{
+    "@@locale": "en",
+    "AppTitle": "E-Store",
+    "Greeting": "Hello, {name}!",
+    "@Greeting": {
+        "placeholders": {
+            "name": {
+                "type": "String",
+                "example": "John"
+            }
+        }
+    },
+    "WelcomeToEStore": "Enjoy your shopping experience",
+    "Categories": "Categories",
+    "NewArrivals": "New Arrivals",
+    "PopularProducts": "Popular Products",
+    "Home": "Home",
+    "Cart": "Cart",
+    "Search": "Search",
+    "Explore": "Explore",
+    "Orders": "Orders",
+    "Profile": "Profile",
+    "Settings": "Settings",
+    "Logout": "Logout",
+    "Menu": "Menu",
+    "AppSettings": "App Settings",
+    "AppTheme": "App Theme",
+    "EnableDarkMode":"Enable Dark Mode",
+    "SelectLanguage": "Select Language",
+    "Arabic":"Arabic",
+    "English": "English",
+    "ViewProducts": "View Products",
+    "Specs": "Specs",
+    "Description": "Description",
+    "AddToCart": "AddToCart"
+    
+
+}
