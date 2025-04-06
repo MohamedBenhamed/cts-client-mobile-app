@@ -9,10 +9,10 @@ import 'package:estore_client/core/di/service_locator.dart';
 import 'package:estore_client/features/appSettings/presentation/controllers/settingsCubit.dart';
 import 'package:estore_client/core/utils/themes/theme.dart';
 import 'package:estore_client/generated/l10n.dart';
-import 'package:estore_client/features/homeScreen/HomeScreen.dart';
-import 'package:estore_client/features/storeMain/domain/usecases/get_all_subcategories_usecase.dart';
-import 'package:estore_client/features/storeMain/presentation/controllers/categoriesController/get_all_subcategories_bloc.dart';
-import 'package:estore_client/features/storeMain/presentation/controllers/categoriesController/get_all_subcategories_events.dart';
+import 'package:estore_client/features/navigationMain/HomeScreen.dart';
+import 'package:estore_client/features/home/domain/usecases/get_all_subcategories_usecase.dart';
+import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_bloc.dart';
+import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
                 themeMode: state.isDarkMode ? ThemeMode.dark : ThemeMode.light,
                 theme: TAppTheme.lightTheme,
                 darkTheme: TAppTheme.darkTheme,
-                home: HomeScreen(),
+                home: NavigationMainScreen(),
               );
             },
           );

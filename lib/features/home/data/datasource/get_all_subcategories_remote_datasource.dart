@@ -1,6 +1,6 @@
 import 'package:estore_client/core/network/api_constance.dart';
 import 'package:estore_client/core/network/dio_client.dart';
-import 'package:estore_client/features/storeMain/data/model/get_all_subcategories_model.dart';
+import 'package:estore_client/features/home/data/model/get_all_subcategories_model.dart';
 
 abstract class BaseGetAllSubCategoriesRemoteDataSource {
   Future<List<SubcategoryModel>> getSubCategories();

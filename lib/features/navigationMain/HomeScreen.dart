@@ -1,23 +1,23 @@
-import 'package:estore_client/features/homeScreen/widgets/bottomAppBarWidget.dart';
-import 'package:estore_client/features/homeScreen/widgets/drawerItemWidget.dart';
-import 'package:estore_client/features/storeMain/presentation/screens/StoreMainScreen.dart';
+import 'package:estore_client/features/navigationMain/widgets/bottomAppBarWidget.dart';
+import 'package:estore_client/features/navigationMain/widgets/drawerItemWidget.dart';
+import 'package:estore_client/features/home/presentation/screens/StoreMainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:estore_client/features/appSettings/presentation/screens/appSettings.dart';
 import 'package:estore_client/features/auth/login/presentation/screens/login_screen.dart';
 import 'package:estore_client/features/auth/shared/authCheck/authCubit.dart';
 import 'package:estore_client/features/CustomerAccountSettings/presentation/screens/customer_account_Settins.dart';
-import 'package:estore_client/features/storeMain/presentation/widgets/loginDialog.dart';
+import 'package:estore_client/features/home/presentation/widgets/loginDialog.dart';
 import '../../../generated/l10n.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class NavigationMainScreen extends StatefulWidget {
+  const NavigationMainScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _NavigationMainScreenState createState() => _NavigationMainScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _NavigationMainScreenState extends State<NavigationMainScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool isDrawerOpen = false;

@@ -1,7 +1,7 @@
 // Bloc Events
-import 'package:estore_client/features/storeMain/domain/usecases/get_all_subcategories_usecase.dart';
-import 'package:estore_client/features/storeMain/presentation/controllers/categoriesController/get_all_subcategories_events.dart';
-import 'package:estore_client/features/storeMain/presentation/controllers/categoriesController/get_all_subcategories_states.dart';
+import 'package:estore_client/features/home/domain/usecases/get_all_subcategories_usecase.dart';
+import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_events.dart';
+import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SubcategoryBloc extends Bloc<SubcategoryEvent, SubcategoryState> {

@@ -12,10 +12,10 @@ import 'package:estore_client/features/auth/login/data/repositories/auth_custome
 import 'package:estore_client/features/auth/login/domain/repositories/auth_customer_base_repository.dart';
 import 'package:estore_client/features/auth/login/domain/usecases/auth_customer_usecase.dart';
 import 'package:estore_client/core/network/dio_client.dart';
-import 'package:estore_client/features/storeMain/data/datasource/get_all_subcategories_remote_datasource.dart';
-import 'package:estore_client/features/storeMain/data/repositories/get_all_subcategories_repository.dart';
-import 'package:estore_client/features/storeMain/domain/repositories/get_all_subcategories_base_repository.dart';
-import 'package:estore_client/features/storeMain/domain/usecases/get_all_subcategories_usecase.dart';
+import 'package:estore_client/features/home/data/datasource/get_all_subcategories_remote_datasource.dart';
+import 'package:estore_client/features/home/data/repositories/get_all_subcategories_repository.dart';
+import 'package:estore_client/features/home/domain/repositories/get_all_subcategories_base_repository.dart';
+import 'package:estore_client/features/home/domain/usecases/get_all_subcategories_usecase.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

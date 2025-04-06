@@ -5,7 +5,7 @@ import 'package:estore_client/features/auth/reqistration/presentation/screens/re
 import 'package:estore_client/features/auth/reqistration/presentation/widgets/CustomTextFormField.dart';
 import 'package:estore_client/features/auth/shared/authCheck/authCubit.dart';
 import 'package:estore_client/generated/l10n.dart';
-import 'package:estore_client/features/homeScreen/HomeScreen.dart';
+import 'package:estore_client/features/navigationMain/HomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:estore_client/features/auth/login/domain/entites/auth_customer.dart';
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
               context.read<AuthCubit>().emit(true);
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(builder: (context) => NavigationMainScreen()),
               );
             });
           }
@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => HomeScreen(),
+                                  builder: (context) => NavigationMainScreen(),
                                 ),
                               );
                             },

@@ -1,6 +1,6 @@
-import 'package:estore_client/features/storeMain/domain/entites/get_all_subcategories.dart';
-import 'package:estore_client/features/storeMain/presentation/controllers/categoriesController/get_all_subcategories_bloc.dart';
-import 'package:estore_client/features/storeMain/presentation/controllers/categoriesController/get_all_subcategories_states.dart';
+import 'package:estore_client/features/home/domain/entites/get_all_subcategories.dart';
+import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_bloc.dart';
+import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../generated/l10n.dart';

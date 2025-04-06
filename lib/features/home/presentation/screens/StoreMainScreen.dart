@@ -1,8 +1,8 @@
-import 'package:estore_client/features/storeMain/presentation/widgets/greetingSection.dart';
-import 'package:estore_client/features/storeMain/presentation/widgets/categoriesContainer.dart';
-import 'package:estore_client/features/storeMain/presentation/widgets/imageSlider.dart';
-import 'package:estore_client/features/storeMain/presentation/widgets/newArrivalsContainer.dart';
-import 'package:estore_client/features/storeMain/presentation/widgets/popularProductsContainer.dart';
+import 'package:estore_client/features/home/presentation/widgets/greetingSection.dart';
+import 'package:estore_client/features/home/presentation/widgets/categoriesContainer.dart';
+import 'package:estore_client/features/home/presentation/widgets/imageSlider.dart';
+import 'package:estore_client/features/home/presentation/widgets/newArrivalsContainer.dart';
+import 'package:estore_client/features/home/presentation/widgets/popularProductsContainer.dart';
 import 'package:flutter/material.dart';
 
 class StoreMainScreen extends StatefulWidget {

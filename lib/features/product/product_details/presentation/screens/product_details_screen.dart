@@ -1,6 +1,6 @@
 import 'package:estore_client/features/product/product_details/presentation/widgets/profileComplationDailog.dart';
 import 'package:estore_client/generated/l10n.dart';
-import 'package:estore_client/features/storeMain/presentation/screens/StoreMainScreen.dart';
+import 'package:estore_client/features/home/presentation/screens/StoreMainScreen.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailsScreen extends StatefulWidget {

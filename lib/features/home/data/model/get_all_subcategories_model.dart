@@ -1,4 +1,4 @@
-import 'package:estore_client/features/storeMain/domain/entites/get_all_subcategories.dart';
+import 'package:estore_client/features/home/domain/entites/get_all_subcategories.dart';
 
 class SubcategoryModel extends GetAllSubCategories {
   const SubcategoryModel({

@@ -7,7 +7,7 @@ import 'package:estore_client/features/auth/reqistration/presentation/widgets/Cu
 import 'package:estore_client/features/auth/shared/authCheck/authCubit.dart';
 import 'package:estore_client/core/di/service_locator.dart';
 import 'package:estore_client/generated/l10n.dart';
-import 'package:estore_client/features/homeScreen/HomeScreen.dart';
+import 'package:estore_client/features/navigationMain/HomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -56,7 +56,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               context.read<AuthCubit>().emit(true);
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(builder: (context) => NavigationMainScreen()),
               );
             });
           }
@@ -254,7 +254,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                         Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => HomeScreen(),
+                                            builder:
+                                                (context) =>
+                                                    NavigationMainScreen(),
                                           ),
                                         );
                                       },

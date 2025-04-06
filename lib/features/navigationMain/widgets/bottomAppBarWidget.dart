@@ -1,6 +1,6 @@
 import 'package:estore_client/features/auth/shared/authCheck/authCubit.dart';
 import 'package:estore_client/generated/l10n.dart';
-import 'package:estore_client/features/homeScreen/widgets/navItemsWidgets.dart';
+import 'package:estore_client/features/navigationMain/widgets/navItemsWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
