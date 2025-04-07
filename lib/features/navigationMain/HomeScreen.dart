@@ -1,6 +1,7 @@
 import 'package:estore_client/features/navigationMain/widgets/bottomAppBarWidget.dart';
 import 'package:estore_client/features/navigationMain/widgets/drawerItemWidget.dart';
 import 'package:estore_client/features/home/presentation/screens/StoreMainScreen.dart';
+import 'package:estore_client/features/search/presentation/screens/searchScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:estore_client/features/appSettings/presentation/screens/appSettings.dart';
@@ -81,7 +82,7 @@ class _NavigationMainScreenState extends State<NavigationMainScreen>
 
   final List<Widget> _screens = [
     StoreMainScreen(), // Home screen
-    StoreMainScreen(), // Search screen
+    SearchScreen(), // Search screen
     StoreMainScreen(), // Orders screen
     StoreMainScreen(), // Orders screen
     CustomerAccountSettins(), // Profile screen

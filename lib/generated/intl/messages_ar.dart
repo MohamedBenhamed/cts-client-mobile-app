@@ -90,7 +90,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Register": MessageLookupByLibrary.simpleMessage("تسجيل"),
     "Registration": MessageLookupByLibrary.simpleMessage("إنشاء حساب"),
     "Save": MessageLookupByLibrary.simpleMessage("حفظ"),
-    "Search": MessageLookupByLibrary.simpleMessage("بحث"),
+    "Search": MessageLookupByLibrary.simpleMessage("البحث"),
     "SelectLanguage": MessageLookupByLibrary.simpleMessage("إختر اللغة"),
     "Settings": MessageLookupByLibrary.simpleMessage("الإعدادات"),
     "SignUp": MessageLookupByLibrary.simpleMessage("تسجيل حساب جديد"),

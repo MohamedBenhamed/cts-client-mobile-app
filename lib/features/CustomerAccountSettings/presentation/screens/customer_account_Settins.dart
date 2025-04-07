@@ -14,7 +14,6 @@ class CustomerAccountSettins extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Triggering the fetch when the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CustomerBloc>().add(FetchCustomerInfo());
     });

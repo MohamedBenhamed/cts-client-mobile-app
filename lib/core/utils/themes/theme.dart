@@ -10,6 +10,7 @@ class TAppTheme {
     fontFamily: GoogleFonts.cairo().fontFamily,
     brightness: Brightness.light,
     scaffoldBackgroundColor: const Color(0xFFFAFAFA),
+    cardColor: const Color(0xFFFAFAFA),
     primaryColor: Colors.teal,
     textTheme: TTextTheme.lightTextTheme,
   );
@@ -18,6 +19,7 @@ class TAppTheme {
     fontFamily: GoogleFonts.cairo().fontFamily,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: const Color(0xFF1E1E1E),
+    cardColor: Colors.grey[900],
     primaryColor: Colors.teal,
     textTheme: TTextTheme.darkTextTheme,
   );
