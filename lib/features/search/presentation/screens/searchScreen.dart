@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_bloc.dart';
+import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_events.dart';
 import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,71 +13,102 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+    context.read<ProductsBloc>().add(
+      LoadProducts(),
+    ); // Load all products initially
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      final query = _searchController.text.trim();
+      context.read<ProductsBloc>().add(SearchProducts(query));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocBuilder<ProductsBloc, GetAllProductsStates>(
-          builder: (context, state) {
-            if (state is GetAllProductsLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is GetAllProductsLoaded) {
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    // Search Field
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Search...',
-                              prefixIcon: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.search, size: 30),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.teal,
-                                ),
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.teal,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            onChanged: (value) {},
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Search Bar
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.teal),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                            color: Colors.teal,
+                            width: 2.0,
                           ),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.tune_outlined, size: 30),
-                        ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 16.0),
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: state.products.length,
+                  ),
+                  IconButton(
+                    onPressed: () {}, // Optional: filter logic
+                    icon: const Icon(Icons.tune_outlined, size: 28),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+
+              // Products List
+              Expanded(
+                child: BlocBuilder<ProductsBloc, GetAllProductsStates>(
+                  builder: (context, state) {
+                    if (state is GetAllProductsLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is GetAllProductsLoaded) {
+                      final products = state.products;
+
+                      if (products.isEmpty) {
+                        return const Center(child: Text('No products found.'));
+                      }
+
+                      return ListView.separated(
+                        itemCount: products.length,
                         separatorBuilder:
                             (context, index) => const SizedBox(height: 16),
                         itemBuilder: (context, index) {
-                          final product = state.products[index];
+                          final product = products[index];
                           return Card(
                             elevation: 2,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
                                 children: [
-                                  // Image
+                                  // Image preview
                                   Container(
                                     width: 100,
                                     height: 100,
@@ -85,7 +118,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                     ),
                                     child: Stack(
                                       children: [
-                                        // Image background
                                         ClipRRect(
                                           borderRadius: BorderRadius.circular(
                                             8.0,
@@ -97,8 +129,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                             fit: BoxFit.cover,
                                           ),
                                         ),
-
-                                        // Only show ribbon if discount > 0
                                         if (double.tryParse(product.discount) !=
                                                 null &&
                                             double.parse(product.discount) > 0)
@@ -114,10 +144,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                               decoration: const BoxDecoration(
                                                 color: Colors.red,
                                                 borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(8),
                                                   bottomRight: Radius.circular(
                                                     8,
                                                   ),
-                                                  topLeft: Radius.circular(8),
                                                 ),
                                               ),
                                               child: Text(
@@ -133,9 +163,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                       ],
                                     ),
                                   ),
-
                                   const SizedBox(width: 12),
-
+                                  // Product Info
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -154,27 +183,31 @@ class _SearchScreenState extends State<SearchScreen> {
                                           ),
                                         ),
                                         const SizedBox(height: 5),
-
-                                        // Price display: show discounted price and original price if discount > 0
-                                        if (double.parse(product.discount) >
-                                            0) ...[
-                                          Text(
-                                            '${double.parse(product.price).toInt()} LYD',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${(double.parse(product.price) * (1 - double.parse(product.discount))).toInt()} LYD',
-                                            style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ] else
+                                        if (double.parse(product.discount) > 0)
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${double.parse(product.price).toInt()} LYD',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  decoration:
+                                                      TextDecoration
+                                                          .lineThrough,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${(double.parse(product.price) * (1 - double.parse(product.discount))).toInt()} LYD',
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        else
                                           Text(
                                             '${double.parse(product.price).toInt()} LYD',
                                             style: const TextStyle(
@@ -190,17 +223,19 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                           );
                         },
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            } else if (state is GetAllProductsError) {
-              return const Center(child: Text('Error loading products'));
-            }
+                      );
+                    } else if (state is GetAllProductsError) {
+                      return const Center(
+                        child: Text("Failed to load the products"),
+                      );
+                    }
 
-            return const Center(child: Text("No data available"));
-          },
+                    return const Center(child: Text("No data available"));
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
