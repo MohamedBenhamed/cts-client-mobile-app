@@ -16,6 +16,10 @@ import 'package:estore_client/features/home/data/datasource/get_all_subcategorie
 import 'package:estore_client/features/home/data/repositories/get_all_subcategories_repository.dart';
 import 'package:estore_client/features/home/domain/repositories/get_all_subcategories_base_repository.dart';
 import 'package:estore_client/features/home/domain/usecases/get_all_subcategories_usecase.dart';
+import 'package:estore_client/features/search/data/datasource/get_all_productsHeaders_remote_datasource.dart';
+import 'package:estore_client/features/search/data/repositories/get_all_products_repository.dart';
+import 'package:estore_client/features/search/domain/repositories/get_all_products_base_repository.dart';
+import 'package:estore_client/features/search/domain/usecases/get_all_products_usecase.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -95,10 +99,23 @@ class ServiceLocator {
         getIt<BaseGetAllSubCategoriesRemoteDataSource>(),
       ),
     );
-
-    // 🔹 Register GetAllSubCategories Use Case
     getIt.registerLazySingleton<GetAllSubCategoriesUseCase>(
       () => GetAllSubCategoriesUseCase(getIt<GetAllCategoriesBaseRepository>()),
+    );
+
+    getIt.registerLazySingleton<BaseGetAllProductsHeadersRemoteDataSource>(
+      () =>
+          GetAllProductsHeadersRemoteDataSource(dioClient: getIt<DioClient>()),
+    );
+
+    getIt.registerLazySingleton<GetAllProductsBaseRepository>(
+      () => GetAllProductsRepository(
+        getIt<BaseGetAllProductsHeadersRemoteDataSource>(),
+      ),
+    );
+
+    getIt.registerLazySingleton<GetAllProductsUsecase>(
+      () => GetAllProductsUsecase(getIt<GetAllProductsBaseRepository>()),
     );
   }
 }

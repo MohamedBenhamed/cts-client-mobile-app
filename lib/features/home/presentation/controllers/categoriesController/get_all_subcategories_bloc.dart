@@ -22,7 +22,6 @@ class SubcategoryBloc extends Bloc<SubcategoryEvent, SubcategoryState> {
       final subcategories = await getAllSubCategoriesUseCase();
       emit(SubcategoryLoaded(subcategories));
     } catch (e) {
-      print(e);
       emit(SubcategoryError("Failed to load subcategories"));
     }
   }

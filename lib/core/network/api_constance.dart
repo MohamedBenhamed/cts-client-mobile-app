@@ -13,4 +13,5 @@ class ApiConstance {
   static String get logIn => "$baseUrl/login/";
   static String get getCustomerInfoById => "$baseUrl/customer";
   static String get getSubCategories => "$baseUrl/subcategories/";
+  static String get getProductsHeaders => "$baseUrl/products/";
 }

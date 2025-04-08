@@ -8,6 +8,11 @@ import 'package:estore_client/features/auth/shared/authCheck/authCubit.dart';
 import 'package:estore_client/core/di/service_locator.dart';
 import 'package:estore_client/features/appSettings/presentation/controllers/settingsCubit.dart';
 import 'package:estore_client/core/utils/themes/theme.dart';
+import 'package:estore_client/features/search/domain/usecases/get_all_products_usecase.dart';
+import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_bloc.dart';
+import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_events.dart';
+import 'package:estore_client/features/search/presentation/screens/productsTest_screen.dart';
+import 'package:estore_client/features/search/presentation/screens/searchScreen.dart';
 import 'package:estore_client/generated/l10n.dart';
 import 'package:estore_client/features/navigationMain/HomeScreen.dart';
 import 'package:estore_client/features/home/domain/usecases/get_all_subcategories_usecase.dart';
@@ -55,6 +60,12 @@ class MyApp extends StatelessWidget {
                   SubcategoryBloc(getIt<GetAllSubCategoriesUseCase>())
                     ..add(LoadSubcategories()),
         ),
+        BlocProvider(
+          create:
+              (context) =>
+                  ProductsBloc(getIt<GetAllProductsUsecase>())
+                    ..add(LoadProducts()),
+        ),
       ],
       child: Builder(
         builder: (context) {
@@ -72,7 +83,6 @@ class MyApp extends StatelessWidget {
                 themeMode: state.isDarkMode ? ThemeMode.dark : ThemeMode.light,
                 theme: TAppTheme.lightTheme,
                 darkTheme: TAppTheme.darkTheme,
-                //home: SearchScreen(),
                 home: NavigationMainScreen(),
               );
             },
