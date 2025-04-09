@@ -7,6 +7,8 @@ class Productsheader extends Equatable {
   final String discount;
   final List<String> images;
   final int stock;
+  final String brandName;
+  final int brandId;
   final int categoryId;
   final int subcategoryId;
   final DateTime createdAt;
@@ -18,6 +20,8 @@ class Productsheader extends Equatable {
     required this.discount,
     required this.images,
     required this.stock,
+    required this.brandName,
+    required this.brandId,
     required this.categoryId,
     required this.subcategoryId,
     required this.createdAt,
@@ -31,6 +35,8 @@ class Productsheader extends Equatable {
     discount,
     images,
     stock,
+    brandName,
+    brandId,
     categoryId,
     subcategoryId,
     createdAt,

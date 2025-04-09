@@ -170,8 +170,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
-                                          'Apple',
+                                        Text(
+                                          product.brandName,
                                           style: TextStyle(fontSize: 12),
                                         ),
                                         const SizedBox(height: 5),
