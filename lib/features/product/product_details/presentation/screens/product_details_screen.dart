@@ -2,9 +2,18 @@ import 'package:estore_client/features/product/product_details/presentation/widg
 import 'package:estore_client/generated/l10n.dart';
 import 'package:estore_client/features/home/presentation/screens/StoreMainScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:estore_client/features/search/domain/entites/productsHeader.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  const ProductDetailsScreen({super.key});
+  final Productsheader product;
+  final String stockStatus;
+  final Map<String, double> priceInfo;
+  const ProductDetailsScreen({
+    super.key,
+    required this.product,
+    required this.stockStatus,
+    required this.priceInfo,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -47,22 +56,81 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        height: 70,
+        height: 100,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             SizedBox(
               child: Row(
                 children: [
-                  Text(
-                    '365',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    S.of(context).LYD,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  if (widget.stockStatus.isNotEmpty)
+                    Text(
+                      widget.stockStatus,
+                      style: const TextStyle(fontSize: 16, color: Colors.red),
+                    ),
+                  if (!widget.stockStatus.isNotEmpty)
+                    if (widget.product.originalPrice != 0.0)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            child: Row(
+                              children: [
+                                Text(
+                                  '${widget.priceInfo['originalPrice']!.toInt()}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    decoration: TextDecoration.lineThrough,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  S.of(context).LYD,
+                                  style: Theme.of(context).textTheme.labelSmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            child: Row(
+                              children: [
+                                Text(
+                                  '${widget.priceInfo['discountedPrice']!.toInt()}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  S.of(context).LYD,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      SizedBox(
+                        child: Row(
+                          children: [
+                            Text(
+                              '${widget.priceInfo['discountedPrice']!.toInt()}',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              S.of(context).LYD,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
                 ],
               ),
             ),
@@ -96,7 +164,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'FC25',
+                      widget.product.name,
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     IconButton(
@@ -125,7 +193,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.asset(
-                                  "assets/products/ps5games/eldenringDLC.jpg",
+                                  widget.product.images[0],
                                   width: MediaQuery.of(context).size.width,
                                   height: 350,
                                   fit: BoxFit.contain,
@@ -133,6 +201,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                               ),
                             ],
                           ),
+                          if (widget.product.discount.isNotEmpty &&
+                              double.parse(widget.product.discount) > 0)
+                            Positioned(
+                              top: 0, // Positioning to the top-right
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(
+                                      8,
+                                    ), // Rounded corner on the right
+                                    bottomLeft: Radius.circular(
+                                      8,
+                                    ), // Optional, but visually consistent
+                                  ),
+                                ),
+                                child: Text(
+                                  '${(double.parse(widget.product.discount) * 100).toInt()}%',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -161,7 +259,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
                                       child: Image.asset(
-                                        "assets/products/ps5games/eldenringDLC.jpg",
+                                        widget.product.images[0],
                                         width:
                                             MediaQuery.of(context).size.width,
                                         height: 100,
@@ -188,9 +286,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                     padding: const EdgeInsets.all(15.0),
                     child: Row(
                       children: [
-                        SizedBox(
-                          child: Image.asset(
-                            "assets/companiesIcons/ea.webp",
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Image.network(
+                            widget.product.brandIcon,
                             width: 50,
                             height: 50,
                             fit: BoxFit.contain,
@@ -203,7 +305,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'EA Games',
+                                widget.product.brandName,
                                 style:
                                     Theme.of(context).textTheme.displayMedium,
                               ),
@@ -266,7 +368,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                             ),
                             SizedBox(height: 10),
                             Text(
-                              'The Elden Ring represents and influences the law of the world. Long ago, the Greater Will sent a golden star to the Lands Between bearing an Elden Beast, which later became the Elden Ring. This beast was the vassal of the Greater Will, and the living embodiment of the concept of Order.',
+                              widget.product.description ??
+                                  'No description available',
                               style: Theme.of(context).textTheme.titleSmall,
                               textAlign: TextAlign.justify,
                             ),

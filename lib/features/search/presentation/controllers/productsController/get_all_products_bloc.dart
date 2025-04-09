@@ -35,7 +35,6 @@ class ProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {
     final query = event.query.toLowerCase().trim();
 
     if (query.isEmpty) {
-      // If query is empty, show all products
       emit(GetAllProductsLoaded(_allProducts));
     } else {
       final filtered =
@@ -45,5 +44,21 @@ class ProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {
 
       emit(GetAllProductsLoaded(filtered));
     }
+  }
+
+  // Function to get the out-of-stock status for the UI
+  String getStockStatus(Productsheader product) {
+    if (product.isOutOfStock) {
+      return 'Out of stock';
+    } else {
+      return '';
+    }
+  }
+
+  // Function to get the price info (including discount) for the UI
+  Map<String, double> getPriceInfo(Productsheader product) {
+    double discountedPrice = product.discountedPrice;
+    double originalPrice = product.originalPrice;
+    return {'discountedPrice': discountedPrice, 'originalPrice': originalPrice};
   }
 }

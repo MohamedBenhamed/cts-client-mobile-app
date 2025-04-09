@@ -16,7 +16,7 @@ class GetAllProductsHeadersRemoteDataSource
   Future<List<ProductheaderModel>> getProductsHeaders() async {
     try {
       final response = await dioClient.get(ApiConstance.getProductsHeaders);
-      print(response);
+
       if (response.statusCode == 200) {
         return (response.data as List)
             .map((e) => ProductheaderModel.fromJson(e as Map<String, dynamic>))

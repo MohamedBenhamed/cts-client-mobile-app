@@ -9,6 +9,7 @@ class ApiConstance {
     }
   }
 
+  //static String get baseUrl => 'http://192.168.31.112:8000/api';
   static String get registration => "$baseUrl/register/";
   static String get logIn => "$baseUrl/login/";
   static String get getCustomerInfoById => "$baseUrl/customer";

@@ -1,5 +1,4 @@
 import '../../../../../generated/l10n.dart';
-import 'package:estore_client/features/product/product_details/presentation/screens/product_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:redacted/redacted.dart';
 
@@ -75,10 +74,10 @@ Widget productCard(
       if (onTap != null) {
         onTap();
       } else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProductDetailsScreen()),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => ProductDetailsScreen()),
+        // );
       }
     },
     child: Container(
