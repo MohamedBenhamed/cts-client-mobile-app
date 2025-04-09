@@ -81,6 +81,7 @@ class MyApp extends StatelessWidget {
                 themeMode: state.isDarkMode ? ThemeMode.dark : ThemeMode.light,
                 theme: TAppTheme.lightTheme,
                 darkTheme: TAppTheme.darkTheme,
+                debugShowCheckedModeBanner: false,
                 home: NavigationMainScreen(),
               );
             },

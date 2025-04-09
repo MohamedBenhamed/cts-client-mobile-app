@@ -171,7 +171,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         const Text(
-                                          'Samsung',
+                                          'Apple',
                                           style: TextStyle(fontSize: 12),
                                         ),
                                         const SizedBox(height: 5),
@@ -183,7 +183,18 @@ class _SearchScreenState extends State<SearchScreen> {
                                           ),
                                         ),
                                         const SizedBox(height: 5),
-                                        if (double.parse(product.discount) > 0)
+                                        if (product.stock == 0)
+                                          const Text(
+                                            'Out of stock',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.red,
+                                            ),
+                                          )
+                                        else if (double.parse(
+                                              product.discount,
+                                            ) >
+                                            0)
                                           Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
