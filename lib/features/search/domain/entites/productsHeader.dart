@@ -5,6 +5,7 @@ class Productsheader extends Equatable {
   final String name;
   final String price;
   final String description;
+  final Map<String, String> specs;
   double get discountedPrice {
     final priceDouble = double.tryParse(
       price.toString(),
@@ -49,6 +50,7 @@ class Productsheader extends Equatable {
     required this.name,
     required this.price,
     required this.description,
+    required this.specs,
     required this.discount,
     required this.images,
     required this.stock,
@@ -66,6 +68,7 @@ class Productsheader extends Equatable {
     name,
     price,
     description,
+    specs,
     discount,
     images,
     stock,

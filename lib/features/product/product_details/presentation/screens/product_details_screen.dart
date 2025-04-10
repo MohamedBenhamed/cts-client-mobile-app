@@ -39,6 +39,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
+    bool isRTL = Directionality.of(context) == TextDirection.rtl;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -368,8 +369,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                             ),
                             SizedBox(height: 10),
                             Text(
-                              widget.product.description ??
-                                  'No description available',
+                              widget.product.description,
                               style: Theme.of(context).textTheme.titleSmall,
                               textAlign: TextAlign.justify,
                             ),
@@ -386,51 +386,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             SizedBox(height: 10),
-                            Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Platform',
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.titleLarge,
-                                    ),
-                                    SizedBox(width: 100),
-                                    Text(
-                                      'PlayStation 5',
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.titleSmall,
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Game Class',
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.titleLarge,
-                                    ),
-                                    SizedBox(width: 100),
-                                    Text(
-                                      'RPG',
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.titleSmall,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                            isRTL
+                                ? buildDynamicSpecsAr(widget.product.specs)
+                                : buildDynamicSpecsEn(widget.product.specs),
                           ],
                         ),
                       ),
@@ -444,4 +402,80 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
       ),
     );
   }
+}
+
+Widget buildDynamicSpecsAr(Map<String, String> specs) {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children:
+              specs.keys.map((key) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    key[0].toUpperCase() + key.substring(1),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                );
+              }).toList(),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children:
+              specs.values.map((value) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(value, style: const TextStyle(fontSize: 16)),
+                );
+              }).toList(),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget buildDynamicSpecsEn(Map<String, String> specs) {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children:
+              specs.keys.map((key) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    key[0].toUpperCase() + key.substring(1),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                );
+              }).toList(),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children:
+              specs.values.map((value) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(value, style: const TextStyle(fontSize: 16)),
+                );
+              }).toList(),
+        ),
+      ],
+    ),
+  );
 }
