@@ -82,6 +82,7 @@ class MyApp extends StatelessWidget {
                 theme: TAppTheme.lightTheme,
                 darkTheme: TAppTheme.darkTheme,
                 debugShowCheckedModeBanner: false,
+                //home: CartScreen(),
                 home: NavigationMainScreen(),
               );
             },
