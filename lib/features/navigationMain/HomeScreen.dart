@@ -13,17 +13,23 @@ import 'package:estore_client/features/home/presentation/widgets/loginDialog.dar
 import '../../../generated/l10n.dart';
 
 class NavigationMainScreen extends StatefulWidget {
-  const NavigationMainScreen({super.key});
+  final int initialIndex;
+  final int parameter;
+  const NavigationMainScreen({
+    this.initialIndex = 0,
+    super.key,
+    this.parameter = 0,
+  });
 
   @override
   _NavigationMainScreenState createState() => _NavigationMainScreenState();
 }
 
 class _NavigationMainScreenState extends State<NavigationMainScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   bool isDrawerOpen = false;
-  int _screenIndex = 0;
+  late int _screenIndex;
 
   String getAppTitle(BuildContext context) {
     switch (_screenIndex) {
@@ -40,28 +46,6 @@ class _NavigationMainScreenState extends State<NavigationMainScreen>
       default:
         return S.of(context).AppTitle;
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 300),
-    );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final authCubit = context.read<AuthCubit>();
-      final isLoggedIn = authCubit.state;
-
-      if (isLoggedIn == null) {
-        // Show loading state or wait for state to be determined
-        bool isLogin = await authCubit.checkAuthStatus();
-        if (isLogin == false) {
-          logInDialog(context);
-        }
-      }
-    });
   }
 
   void toggleDrawer() {
@@ -81,13 +65,56 @@ class _NavigationMainScreenState extends State<NavigationMainScreen>
     super.dispose();
   }
 
-  final List<Widget> _screens = [
-    StoreMainScreen(), // Home screen
-    SearchScreen(), // Search screen
-    CartScreen(), // Orders screen
-    StoreMainScreen(), // Orders screen
-    CustomerAccountSettins(), // Profile screen
-  ];
+  late List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+    _screenIndex = widget.initialIndex;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final authCubit = context.read<AuthCubit>();
+      final isLoggedIn = authCubit.state;
+
+      if (isLoggedIn == null) {
+        // Show loading state or wait for state to be determined
+        bool isLogin = await authCubit.checkAuthStatus();
+        if (isLogin == false) {
+          logInDialog(context);
+        }
+      }
+    });
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+    _screenIndex = widget.initialIndex;
+
+    _screens = [
+      StoreMainScreen(), // Home screen
+      SearchScreen(parameter: widget.parameter), // Search screen
+      CartScreen(), // Orders screen
+      StoreMainScreen(), // Orders screen
+      CustomerAccountSettins(), // Profile screen
+    ];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final authCubit = context.read<AuthCubit>();
+      final isLoggedIn = authCubit.state;
+
+      if (isLoggedIn == null) {
+        // Show loading state or wait for state to be determined
+        bool isLogin = await authCubit.checkAuthStatus();
+        if (isLogin == false) {
+          logInDialog(context);
+        }
+      }
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {

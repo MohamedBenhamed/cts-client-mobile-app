@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:estore_client/features/home/domain/entites/get_all_subcategories.dart';
+import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_bloc.dart';
+import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_states.dart';
 import 'package:estore_client/features/product/product_details/presentation/screens/product_details_screen.dart';
 import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_bloc.dart';
 import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_events.dart';
@@ -7,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final int parameter;
+  const SearchScreen({super.key, required this.parameter});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -16,14 +20,18 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
+  late Set<int> _selectedTagIds;
 
   @override
   void initState() {
     super.initState();
+    _selectedTagIds = {widget.parameter};
     _searchController.addListener(_onSearchChanged);
-    context.read<ProductsBloc>().add(
-      LoadProducts(),
-    ); // Load all products initially
+    if (widget.parameter != 0) {
+      context.read<ProductsBloc>().add(FilterProducts(_selectedTagIds));
+    } else {
+      context.read<ProductsBloc>().add(LoadProducts());
+    }
   }
 
   @override
@@ -36,10 +44,26 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
+    _debounce = Timer(const Duration(milliseconds: 500), () {
       final query = _searchController.text.trim();
-      context.read<ProductsBloc>().add(SearchProducts(query));
+      _performSearchOrFilter(query, _selectedTagIds);
     });
+  }
+
+  void _performSearchOrFilter(String query, Set<int> tagIds) {
+    if (query.isEmpty) {
+      if (tagIds.contains(0)) {
+        context.read<ProductsBloc>().add(LoadProducts());
+      } else {
+        context.read<ProductsBloc>().add(FilterProducts(_selectedTagIds));
+      }
+    } else {
+      if (tagIds.contains(0)) {
+        context.read<ProductsBloc>().add(SearchProducts(query));
+      } else {
+        context.read<ProductsBloc>().add(SearchFilteredProducts(query, tagIds));
+      }
+    }
   }
 
   @override
@@ -50,7 +74,6 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Search Bar
               Row(
                 children: [
                   Expanded(
@@ -77,14 +100,97 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {}, // Optional: filter logic
+                    onPressed: () {
+                      setState(() {
+                        _selectedTagIds = {0};
+                      });
+                      _performSearchOrFilter("", _selectedTagIds);
+                    },
                     icon: const Icon(Icons.tune_outlined, size: 28),
                   ),
                 ],
               ),
               const SizedBox(height: 16.0),
+              // ✅ TAGS START HERE (MULTI-SELECT)
+              BlocBuilder<SubcategoryBloc, SubcategoryState>(
+                builder: (context, state) {
+                  if (state is SubcategoryLoaded) {
+                    final tags = [
+                      GetAllSubCategories(
+                        id: 0,
+                        nameAr: "الكل",
+                        nameEn: "All",
+                        specsKey: [],
+                        categoryId: 0,
+                        iconUrl: "",
+                      ),
+                      ...state.subcategories,
+                    ];
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children:
+                            tags.map((tag) {
+                              final isSelected = _selectedTagIds.contains(
+                                tag.id,
+                              );
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: FilterChip(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    side: BorderSide(
+                                      color:
+                                          isSelected
+                                              ? Colors.white
+                                              : Colors.teal,
+                                    ),
+                                  ),
+                                  label: Text(tag.nameAr),
+                                  selected: isSelected,
+                                  selectedColor: Colors.teal,
+                                  labelStyle: TextStyle(
+                                    color:
+                                        isSelected
+                                            ? Colors.white
+                                            : Theme.of(
+                                                  context,
+                                                ).textTheme.labelSmall?.color ??
+                                                Colors.black,
+                                  ),
+                                  onSelected: (selected) {
+                                    setState(() {
+                                      if (tag.id == 0) {
+                                        _selectedTagIds = {0};
+                                      } else {
+                                        _selectedTagIds.remove(0);
+                                        if (isSelected) {
+                                          _selectedTagIds.remove(tag.id);
+                                          if (_selectedTagIds.isEmpty) {
+                                            _selectedTagIds = {0};
+                                          }
+                                        } else {
+                                          _selectedTagIds.add(tag.id);
+                                        }
+                                      }
+                                      _searchController.clear();
+                                    });
+                                    _performSearchOrFilter(
+                                      _searchController.text.trim(),
+                                      _selectedTagIds,
+                                    );
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                      ),
+                    );
+                  }
 
-              // Products List
+                  return const SizedBox.shrink();
+                },
+              ),
+              const SizedBox(height: 16.0),
               Expanded(
                 child: BlocBuilder<ProductsBloc, GetAllProductsStates>(
                   builder: (context, state) {
@@ -96,12 +202,17 @@ class _SearchScreenState extends State<SearchScreen> {
                       if (products.isEmpty) {
                         return const Center(child: Text('No products found.'));
                       }
-                      return ListView.separated(
-                        itemCount: products.length,
-                        separatorBuilder:
-                            (context, index) => const SizedBox(height: 16),
-                        itemBuilder: (context, index) {
-                          final product = products[index];
+                      return ListView(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        children: List.generate(products.length * 2 - 1, (
+                          index,
+                        ) {
+                          if (index.isOdd) {
+                            return const SizedBox(height: 16);
+                          }
+
+                          final productIndex = index ~/ 2;
+                          final product = products[productIndex];
                           final stockStatus = context
                               .read<ProductsBloc>()
                               .getStockStatus(product);
@@ -118,6 +229,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 originalPrice *
                                 (1 - double.parse(product.discount));
                           }
+
                           return InkWell(
                             onTap: () {
                               Navigator.push(
@@ -128,150 +240,169 @@ class _SearchScreenState extends State<SearchScreen> {
                                         product: product,
                                         stockStatus: stockStatus,
                                         priceInfo: {
-                                          'originalPrice':
-                                              originalPrice, // double value
-                                          'discountedPrice':
-                                              discountedPrice, // double value
+                                          'originalPrice': originalPrice,
+                                          'discountedPrice': discountedPrice,
                                         },
                                       ),
                                 ),
                               );
                             },
-                            child: Card(
-                              elevation: 2,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    // Image preview
-                                    Container(
-                                      width: 100,
-                                      height: 100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                          8.0,
+                            child: TweenAnimationBuilder<Offset>(
+                              tween: Tween(
+                                begin: Offset(1, 0),
+                                end: Offset(0, 0),
+                              ),
+                              duration: Duration(milliseconds: 500),
+                              curve: Curves.easeOut,
+                              builder: (context, offset, child) {
+                                return Transform.translate(
+                                  offset: offset * 200,
+                                  child: child,
+                                );
+                              },
+                              child: Card(
+                                elevation: 1,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            8.0,
+                                          ),
+                                          color: Colors.teal[50],
                                         ),
-                                        color: Colors.teal[50],
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              8.0,
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Image.asset(
+                                                product.images[0],
+                                                width: 100,
+                                                height: 100,
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
-                                            child: Image.asset(
-                                              product.images[0],
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          if (product.discount.isNotEmpty &&
-                                              double.parse(product.discount) >
-                                                  0)
-                                            Positioned(
-                                              top: 0,
-                                              left: 0,
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2,
-                                                    ),
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.red,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(8),
-                                                        bottomRight:
-                                                            Radius.circular(8),
+                                            if (product.discount.isNotEmpty &&
+                                                double.parse(product.discount) >
+                                                    0)
+                                              Positioned(
+                                                top: 0,
+                                                left: 0,
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2,
                                                       ),
-                                                ),
-                                                child: Text(
-                                                  '${(double.parse(product.discount) * 100).toInt()}%',
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.red,
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                8,
+                                                              ),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                8,
+                                                              ),
+                                                        ),
                                                   ),
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    // Product Info
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            product.brandName,
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          const SizedBox(height: 5),
-                                          Text(
-                                            product.name,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 5),
-                                          if (stockStatus.isNotEmpty)
-                                            Text(
-                                              stockStatus,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          if (!stockStatus.isNotEmpty)
-                                            if (priceInfo['originalPrice']! > 0)
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    '${priceInfo['originalPrice']!.toInt()} LYD',
+                                                  child: Text(
+                                                    '${(double.parse(product.discount) * 100).toInt()}%',
                                                     style: const TextStyle(
-                                                      fontSize: 14,
-                                                      decoration:
-                                                          TextDecoration
-                                                              .lineThrough,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '${priceInfo['discountedPrice']!.toInt()} LYD',
-                                                    style: const TextStyle(
-                                                      fontSize: 20,
+                                                      color: Colors.white,
+                                                      fontSize: 12,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
                                                   ),
-                                                ],
-                                              )
-                                            else
-                                              Text(
-                                                '${priceInfo['discountedPrice']!.toInt()} LYD',
-                                                style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              product.brandName,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              product.name,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            if (stockStatus.isNotEmpty)
+                                              Text(
+                                                stockStatus,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            if (!stockStatus.isNotEmpty)
+                                              if (priceInfo['originalPrice']! >
+                                                  0)
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${priceInfo['originalPrice']!.toInt()} LYD',
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${priceInfo['discountedPrice']!.toInt()} LYD',
+                                                      style: const TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              else
+                                                Text(
+                                                  '${priceInfo['discountedPrice']!.toInt()} LYD',
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           );
-                        },
+                        }),
                       );
                     } else if (state is GetAllProductsError) {
                       return const Center(

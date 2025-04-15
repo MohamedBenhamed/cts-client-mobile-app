@@ -1,8 +1,8 @@
 import 'package:estore_client/features/home/domain/entites/get_all_subcategories.dart';
 import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_bloc.dart';
 import 'package:estore_client/features/home/presentation/controllers/categoriesController/get_all_subcategories_states.dart';
+import 'package:estore_client/features/navigationMain/HomeScreen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../../generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:redacted/redacted.dart';
@@ -22,6 +22,7 @@ Widget categoryList(BuildContext context) {
   );
 }
 
+// ignore: camel_case_types
 class loadingAndErrorCategories extends StatelessWidget {
   const loadingAndErrorCategories({super.key});
 
@@ -172,15 +173,29 @@ Container categoriesContainer(
             scrollDirection: Axis.horizontal,
             children:
                 subcategories.map((subcategory) {
-                  return categoryItem(
-                    context,
-                    subcategory.iconUrl,
-                    isRTL ? subcategory.nameAr : subcategory.nameEn,
-                  ).redacted(
-                    context: context,
-                    redact: false,
-                    configuration: RedactedConfiguration(
-                      animationDuration: const Duration(milliseconds: 800),
+                  return InkWell(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => NavigationMainScreen(
+                                initialIndex: 1,
+                                parameter: subcategory.id,
+                              ),
+                        ),
+                      );
+                    },
+                    child: categoryItem(
+                      context,
+                      subcategory.iconUrl,
+                      isRTL ? subcategory.nameAr : subcategory.nameEn,
+                    ).redacted(
+                      context: context,
+                      redact: false,
+                      configuration: RedactedConfiguration(
+                        animationDuration: const Duration(milliseconds: 800),
+                      ),
                     ),
                   );
                 }).toList(),
