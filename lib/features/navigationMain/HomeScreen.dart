@@ -76,18 +76,6 @@ class _NavigationMainScreenState extends State<NavigationMainScreen>
     );
     _screenIndex = widget.initialIndex;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final authCubit = context.read<AuthCubit>();
-      final isLoggedIn = authCubit.state;
-
-      if (isLoggedIn == null) {
-        // Show loading state or wait for state to be determined
-        bool isLogin = await authCubit.checkAuthStatus();
-        if (isLogin == false) {
-          logInDialog(context);
-        }
-      }
-    });
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),

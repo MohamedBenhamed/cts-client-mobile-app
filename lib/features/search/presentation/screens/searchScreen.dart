@@ -21,6 +21,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   late Set<int> _selectedTagIds;
+  bool inStockOnly = false;
 
   @override
   void initState() {
@@ -45,27 +46,29 @@ class _SearchScreenState extends State<SearchScreen> {
   void _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      if (_searchController.text.trim().isEmpty) {
-        context.read<ProductsBloc>().add(LoadProducts());
-      } else {
-        final query = _searchController.text.trim();
-        _performSearchOrFilter(query, _selectedTagIds);
-      }
+      final query = _searchController.text.trim();
+      _performSearchOrFilter(query, _selectedTagIds);
     });
   }
 
   void _performSearchOrFilter(String query, Set<int> tagIds) {
-    if (query.isEmpty) {
-      if (tagIds.contains(0)) {
+    if (query == "" || query.isEmpty) {
+      if (tagIds.contains(0) && inStockOnly == false) {
         context.read<ProductsBloc>().add(LoadProducts());
+      } else if (tagIds.contains(0) && inStockOnly == true) {
+        context.read<ProductsBloc>().add(
+          FilterProducts(tagIds, stock: inStockOnly),
+        );
       } else {
-        context.read<ProductsBloc>().add(FilterProducts(_selectedTagIds));
+        context.read<ProductsBloc>().add(FilterProducts(tagIds));
       }
     } else {
-      if (tagIds.contains(0)) {
+      if (tagIds.contains(0) || inStockOnly == false) {
         context.read<ProductsBloc>().add(SearchProducts(query));
-      } else {
-        context.read<ProductsBloc>().add(SearchFilteredProducts(query, tagIds));
+      } else if (tagIds.contains(0) || inStockOnly == true) {
+        context.read<ProductsBloc>().add(
+          FilterProducts(tagIds, query: query, stock: inStockOnly),
+        );
       }
     }
   }
@@ -78,20 +81,30 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              SearchingBar(
-                controller: _searchController,
-                onFilterPressed: () {
-                  setState(() {
-                    _selectedTagIds = {0};
-                  });
-                  _performSearchOrFilter("", _selectedTagIds);
-                },
-                onSearchChanged: _onSearchChanged,
+              Row(
+                children: [
+                  Flexible(
+                    child: SearchingBar(
+                      controller: _searchController,
+                      onFilterPressed: () {
+                        setState(() {
+                          _selectedTagIds = {0};
+                        });
+                        _performSearchOrFilter("", _selectedTagIds);
+                      },
+                      onSearchChanged: _onSearchChanged,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      await filterBottomSheet(context);
+                    },
+                    icon: const Icon(Icons.tune_outlined, size: 28),
+                  ),
+                ],
               ),
               const SizedBox(height: 16.0),
-              categoriesTags(),
-              const SizedBox(height: 16.0),
-              ProductsListWidget(),
+              const ProductsListWidget(),
             ],
           ),
         ),
@@ -99,7 +112,86 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  SizedBox categoriesTags() {
+  Future<dynamic> filterBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Filter Options',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Divider(),
+                    const SizedBox(height: 16),
+                    const Text('Categories'),
+                    categoriesTags(setModalState),
+                    const SizedBox(height: 16),
+                    CheckboxListTile(
+                      checkColor: Colors.white,
+                      activeColor: Colors.teal,
+                      title: const Text("In Stock Only"),
+                      value: inStockOnly,
+                      onChanged: (value) {
+                        setModalState(() {
+                          inStockOnly = value ?? false;
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Apply filters
+                          context.read<ProductsBloc>().add(
+                            GetOnlyInStock(inStockOnly),
+                          );
+                          _performSearchOrFilter(
+                            _searchController.text.trim(),
+                            _selectedTagIds,
+                          );
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                        ),
+                        child: const Text(
+                          'Apply Filters',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  SizedBox categoriesTags(void Function(void Function()) setModalState) {
+    bool isRTL = Directionality.of(context) == TextDirection.rtl;
     return SizedBox(
       child: BlocBuilder<SubcategoryBloc, SubcategoryState>(
         builder: (context, state) {
@@ -117,20 +209,24 @@ class _SearchScreenState extends State<SearchScreen> {
             ];
             return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children:
-                    tags.map((tag) {
-                      final isSelected = _selectedTagIds.contains(tag.id);
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: FilterChip(
+              child: SizedBox(
+                width: 400,
+                child: Wrap(
+                  spacing: 4.0,
+                  runSpacing: 4.0,
+                  children:
+                      tags.map((tag) {
+                        final isSelected = _selectedTagIds.contains(tag.id);
+                        return FilterChip(
+                          checkmarkColor: Colors.white,
+                          backgroundColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             side: BorderSide(
                               color: isSelected ? Colors.white : Colors.teal,
                             ),
                           ),
-                          label: Text(tag.nameEn),
+                          label: Text(isRTL ? tag.nameAr : tag.nameEn),
                           selected: isSelected,
                           selectedColor: Colors.teal,
                           labelStyle: TextStyle(
@@ -143,7 +239,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                         Colors.black,
                           ),
                           onSelected: (selected) {
-                            setState(() {
+                            setModalState(() {
                               if (tag.id == 0) {
                                 _selectedTagIds = {0};
                               } else {
@@ -159,18 +255,22 @@ class _SearchScreenState extends State<SearchScreen> {
                               }
                               _searchController.clear();
                             });
-                            _performSearchOrFilter(
-                              _searchController.text.trim(),
-                              _selectedTagIds,
-                            );
                           },
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                ),
               ),
             );
+          } else if (state is SubcategoryError) {
+            return Center(
+              child: Text(
+                state.message,
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          } else if (state is SubcategoryLoading) {
+            return const Center(child: CircularProgressIndicator());
           }
-
           return const SizedBox.shrink();
         },
       ),

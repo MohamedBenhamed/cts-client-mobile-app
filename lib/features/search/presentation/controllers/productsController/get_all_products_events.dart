@@ -9,7 +9,10 @@ class SearchProducts extends ProductsEvent {
 
 class FilterProducts extends ProductsEvent {
   final Set<int> parameters;
-  FilterProducts(this.parameters);
+  final String query;
+  final bool stock;
+
+  FilterProducts(this.parameters, {this.query = "", this.stock = false});
 }
 
 class SearchFilteredProducts extends ProductsEvent {
@@ -17,4 +20,9 @@ class SearchFilteredProducts extends ProductsEvent {
   final Set<int> subcategoryIds;
 
   SearchFilteredProducts(this.query, this.subcategoryIds);
+}
+
+class GetOnlyInStock extends ProductsEvent {
+  final bool stock;
+  GetOnlyInStock(this.stock);
 }

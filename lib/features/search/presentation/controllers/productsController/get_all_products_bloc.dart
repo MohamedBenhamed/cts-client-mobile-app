@@ -6,15 +6,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {
   final GetAllProductsUsecase getAllProductsUsecase;
+
   List<Productsheader> _allProducts = [];
+
+  // 🔥 Active filters
+  String _currentQuery = '';
+  Set<int> _currentSubcategoryIds = {};
+  int? _currentCategoryId;
+  bool _onlyInStock = false;
 
   ProductsBloc(this.getAllProductsUsecase) : super(GetAllProductsInitial()) {
     on<LoadProducts>(_onLoadProducts);
     on<SearchProducts>(_onSearchProducts);
     on<FilterProducts>(_onFilterProducts);
     on<SearchFilteredProducts>(_onSearchFilteredProducts);
+    on<GetOnlyInStock>(_onGetOnlyInStock);
   }
 
+  // 🚀 Load all products and apply filters if any
   Future<void> _onLoadProducts(
     LoadProducts event,
     Emitter<GetAllProductsStates> emit,
@@ -22,74 +31,104 @@ class ProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {
     emit(GetAllProductsLoading());
     try {
       final products = await getAllProductsUsecase();
-      _allProducts = products;
-      emit(GetAllProductsLoaded(products));
+      _allProducts.clear();
+      _allProducts.addAll(products);
+      emit(GetAllProductsLoaded(_applyFilters(isAll: true)));
     } catch (e) {
       emit(GetAllProductsError("Failed to load the products"));
     }
   }
 
+  // 🔍 Update query and apply filters
   Future<void> _onSearchProducts(
     SearchProducts event,
     Emitter<GetAllProductsStates> emit,
   ) async {
-    final query = event.query.trim().toLowerCase();
-    final filtered = _filterProducts(query: query);
-    emit(GetAllProductsLoaded(filtered));
+    _currentQuery = event.query.trim().toLowerCase();
+    emit(GetAllProductsLoaded(_applyFilters()));
   }
 
+  // 🧃 Update subcategory filter and apply
   Future<void> _onFilterProducts(
     FilterProducts event,
     Emitter<GetAllProductsStates> emit,
   ) async {
-    final parameters = event.parameters;
+    final subcategories = event.parameters;
+    print(subcategories);
 
-    // Show all products if "All" is selected
-    if (parameters.isEmpty || parameters.contains(0)) {
-      emit(GetAllProductsLoaded(_allProducts));
+    // 👉 If 0 (All) is selected, ignore subcategory filtering
+    if (subcategories.contains(0)) {
+      _currentSubcategoryIds = {};
+      print(event.stock);
+      _onlyInStock = event.stock;
     } else {
-      final filtered = _filterProducts(subcategoryIds: parameters);
-      emit(GetAllProductsLoaded(filtered));
+      print(event.stock);
+      _currentQuery = event.query.trim().toLowerCase();
+      _currentSubcategoryIds = subcategories;
     }
+
+    emit(GetAllProductsLoaded(_applyFilters()));
   }
 
+  // 🔍 Subcategory + query
   Future<void> _onSearchFilteredProducts(
     SearchFilteredProducts event,
     Emitter<GetAllProductsStates> emit,
   ) async {
-    final query = event.query.trim().toLowerCase();
-    final filtered = _filterProducts(
-      query: query,
-      subcategoryIds: event.subcategoryIds,
-    );
-    emit(GetAllProductsLoaded(filtered));
+    _currentQuery = event.query.trim().toLowerCase();
+
+    // 👉 If 0 (All) is selected, ignore subcategory filtering
+    if (event.subcategoryIds.contains(0)) {
+      _currentSubcategoryIds = {};
+    } else {
+      _currentSubcategoryIds = event.subcategoryIds;
+    }
+
+    emit(GetAllProductsLoaded(_applyFilters()));
   }
 
-  /// ✅ Reusable filtering method
-  List<Productsheader> _filterProducts({
-    String query = '',
-    Set<int> subcategoryIds = const {},
-    int? categoryId,
-  }) {
+  // ✅ Toggle "in stock only"
+  Future<void> _onGetOnlyInStock(
+    GetOnlyInStock event,
+    Emitter<GetAllProductsStates> emit,
+  ) async {
+    _onlyInStock = event.stock;
+    emit(GetAllProductsLoaded(_applyFilters()));
+  }
+
+  // 🧠 Apply all active filters to _allProducts
+  List<Productsheader> _applyFilters({bool isAll = false}) {
+    if (isAll) {
+      return _allProducts;
+    }
     return _allProducts.where((product) {
       final matchesQuery =
-          query.isEmpty || product.name.toLowerCase().contains(query);
-      final matchesSubcategory =
-          subcategoryIds.isEmpty ||
-          subcategoryIds.contains(product.subcategoryId);
-      final matchesCategory =
-          categoryId == null || product.categoryId == categoryId;
+          _currentQuery.isEmpty ||
+          product.name.toLowerCase().contains(_currentQuery);
 
-      return matchesQuery && matchesSubcategory && matchesCategory;
+      final matchesSubcategory =
+          _currentSubcategoryIds.isEmpty ||
+          _currentSubcategoryIds.contains(product.subcategoryId);
+
+      final matchesCategory =
+          _currentCategoryId == null ||
+          product.categoryId == _currentCategoryId;
+
+      final matchesStock = !_onlyInStock || !product.isOutOfStock;
+
+      return matchesQuery &&
+          matchesSubcategory &&
+          matchesCategory &&
+          matchesStock;
     }).toList();
   }
 
-  // Stock status helper
+  // 🏷️ Stock status helper
   String getStockStatus(Productsheader product) {
     return product.isOutOfStock ? 'Out of stock' : '';
   }
 
-  // Price info helper
+  // 💰 Price helper
   Map<String, double> getPriceInfo(Productsheader product) {
     return {
       'discountedPrice': product.discountedPrice,

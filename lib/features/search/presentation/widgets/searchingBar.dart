@@ -37,10 +37,6 @@ class SearchingBar extends StatelessWidget {
             ),
           ),
         ),
-        IconButton(
-          onPressed: onFilterPressed,
-          icon: const Icon(Icons.tune_outlined, size: 28),
-        ),
       ],
     );
   }

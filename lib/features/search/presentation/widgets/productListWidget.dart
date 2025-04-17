@@ -24,7 +24,7 @@ class ProductsListWidget extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 16),
               children: List.generate(products.length * 2 - 1, (index) {
                 if (index.isOdd) {
-                  return const SizedBox(height: 16);
+                  return const SizedBox(height: 5);
                 }
 
                 final productIndex = index ~/ 2;
