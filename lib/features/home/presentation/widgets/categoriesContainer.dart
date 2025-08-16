@@ -47,7 +47,7 @@ class loadingAndErrorCategories extends StatelessWidget {
                     height: 100,
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      shape: BoxShape.circle,
                     ),
                     margin: EdgeInsets.all(5),
                     child: Column(
@@ -79,7 +79,7 @@ class loadingAndErrorCategories extends StatelessWidget {
                     height: 100,
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      shape: BoxShape.circle,
                     ),
                     margin: EdgeInsets.all(5),
                     child: Column(
@@ -120,7 +120,7 @@ Widget categoryItem(BuildContext context, String imageUrl, String label) {
         height: 100,
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
+          shape: BoxShape.circle,
         ),
         margin: EdgeInsets.all(5),
         child: Column(

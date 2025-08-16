@@ -115,6 +115,26 @@ class S {
     );
   }
 
+  /// `Discount Products`
+  String get DiscountProducts {
+    return Intl.message(
+      'Discount Products',
+      name: 'DiscountProducts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Best Sellers`
+  String get BestSellers {
+    return Intl.message(
+      'Best Sellers',
+      name: 'BestSellers',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Home`
   String get Home {
     return Intl.message('Home', name: 'Home', desc: '', args: []);

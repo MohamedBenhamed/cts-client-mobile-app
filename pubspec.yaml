@@ -50,5 +50,6 @@ flutter:
     - assets/sliderImages/
     - assets/products/ps5games/
     - assets/companiesIcons/
+    - assets/products/accessories/watches/
 flutter_intl:
   enabled: true

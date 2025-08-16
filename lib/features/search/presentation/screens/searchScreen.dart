@@ -28,6 +28,10 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     _selectedTagIds = {widget.parameter};
     _searchController.addListener(_onSearchChanged);
+    _loadInitialData();
+  }
+
+  void _loadInitialData() {
     if (widget.parameter != 0) {
       context.read<ProductsBloc>().add(FilterProducts(_selectedTagIds));
     } else {
@@ -52,10 +56,10 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _performSearchOrFilter(String query, Set<int> tagIds) {
-    if (query == "" || query.isEmpty) {
-      if (tagIds.contains(0) && inStockOnly == false) {
+    if (query.isEmpty) {
+      if (tagIds.contains(0) && !inStockOnly) {
         context.read<ProductsBloc>().add(LoadProducts());
-      } else if (tagIds.contains(0) && inStockOnly == true) {
+      } else if (tagIds.contains(0) && inStockOnly) {
         context.read<ProductsBloc>().add(
           FilterProducts(tagIds, stock: inStockOnly),
         );
@@ -63,14 +67,18 @@ class _SearchScreenState extends State<SearchScreen> {
         context.read<ProductsBloc>().add(FilterProducts(tagIds));
       }
     } else {
-      if (tagIds.contains(0) || inStockOnly == false) {
+      if (tagIds.contains(0) || !inStockOnly) {
         context.read<ProductsBloc>().add(SearchProducts(query));
-      } else if (tagIds.contains(0) || inStockOnly == true) {
+      } else if (tagIds.contains(0) || inStockOnly) {
         context.read<ProductsBloc>().add(
           FilterProducts(tagIds, query: query, stock: inStockOnly),
         );
       }
     }
+  }
+
+  Future<void> _refreshData() async {
+    _performSearchOrFilter(_searchController.text.trim(), _selectedTagIds);
   }
 
   @override
@@ -79,33 +87,39 @@ class _SearchScreenState extends State<SearchScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
+          child: Expanded(
+            child: RefreshIndicator(
+              onRefresh: _refreshData,
+              color: Colors.teal,
+              child: Column(
                 children: [
-                  Flexible(
-                    child: SearchingBar(
-                      controller: _searchController,
-                      onFilterPressed: () {
-                        setState(() {
-                          _selectedTagIds = {0};
-                        });
-                        _performSearchOrFilter("", _selectedTagIds);
-                      },
-                      onSearchChanged: _onSearchChanged,
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: SearchingBar(
+                          controller: _searchController,
+                          onFilterPressed: () {
+                            setState(() {
+                              _selectedTagIds = {0};
+                            });
+                            _performSearchOrFilter("", _selectedTagIds);
+                          },
+                          onSearchChanged: _onSearchChanged,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          await filterBottomSheet(context);
+                        },
+                        icon: const Icon(Icons.tune_outlined, size: 28),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    onPressed: () async {
-                      await filterBottomSheet(context);
-                    },
-                    icon: const Icon(Icons.tune_outlined, size: 28),
-                  ),
+                  const SizedBox(height: 16.0),
+                  const ProductsListWidget(),
                 ],
               ),
-              const SizedBox(height: 16.0),
-              const ProductsListWidget(),
-            ],
+            ),
           ),
         ),
       ),
@@ -161,7 +175,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Apply filters
                           context.read<ProductsBloc>().add(
                             GetOnlyInStock(inStockOnly),
                           );

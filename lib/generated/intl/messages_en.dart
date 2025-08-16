@@ -35,6 +35,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "AppTheme": MessageLookupByLibrary.simpleMessage("App Theme"),
     "AppTitle": MessageLookupByLibrary.simpleMessage("E-Store"),
     "Arabic": MessageLookupByLibrary.simpleMessage("Arabic"),
+    "BestSellers": MessageLookupByLibrary.simpleMessage("Best Sellers"),
     "Cart": MessageLookupByLibrary.simpleMessage("Cart"),
     "Categories": MessageLookupByLibrary.simpleMessage("Categories"),
     "ContinueWithoutLogin": MessageLookupByLibrary.simpleMessage(
@@ -45,6 +46,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "DeleteAccount": MessageLookupByLibrary.simpleMessage("Delete Account"),
     "Description": MessageLookupByLibrary.simpleMessage("Description"),
+    "DiscountProducts": MessageLookupByLibrary.simpleMessage(
+      "Discount Products",
+    ),
     "Email": MessageLookupByLibrary.simpleMessage("Email"),
     "EnableDarkMode": MessageLookupByLibrary.simpleMessage("Enable Dark Mode"),
     "English": MessageLookupByLibrary.simpleMessage("English"),

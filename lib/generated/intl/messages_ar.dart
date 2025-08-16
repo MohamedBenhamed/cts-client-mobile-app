@@ -33,6 +33,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "AppTheme": MessageLookupByLibrary.simpleMessage("وضع التطبيق"),
     "AppTitle": MessageLookupByLibrary.simpleMessage("متجر إلكتروني"),
     "Arabic": MessageLookupByLibrary.simpleMessage("العربية"),
+    "BestSellers": MessageLookupByLibrary.simpleMessage("الأكثر مبيعاً"),
     "Cart": MessageLookupByLibrary.simpleMessage("السلة"),
     "Categories": MessageLookupByLibrary.simpleMessage("الأقسام"),
     "ContinueWithoutLogin": MessageLookupByLibrary.simpleMessage(
@@ -43,6 +44,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "DeleteAccount": MessageLookupByLibrary.simpleMessage("حذف الحساب"),
     "Description": MessageLookupByLibrary.simpleMessage("الوصف"),
+    "DiscountProducts": MessageLookupByLibrary.simpleMessage(
+      "المنتجات المخفضة",
+    ),
     "Email": MessageLookupByLibrary.simpleMessage("البريدالإلكتروني"),
     "EnableDarkMode": MessageLookupByLibrary.simpleMessage(
       "تفعيل الوضع المظلم",

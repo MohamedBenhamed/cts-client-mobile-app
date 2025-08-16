@@ -8,7 +8,7 @@ CarouselSlider imageSlider(context) {
         borderRadius: BorderRadius.circular(10),
         child: Image.asset(
           width: MediaQuery.of(context).size.width * 0.750,
-          "assets/sliderImages/image4.png",
+          "assets/sliderImages/image8.png",
           fit: BoxFit.cover,
         ),
       ),

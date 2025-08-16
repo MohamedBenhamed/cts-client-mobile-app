@@ -1,7 +1,8 @@
+import 'package:estore_client/features/home/presentation/controllers/productsController/get_all_products_events.dart';
+import 'package:estore_client/features/home/presentation/controllers/productsController/get_all_products_states.dart';
 import 'package:estore_client/features/search/domain/entites/productsHeader.dart';
 import 'package:estore_client/features/search/domain/usecases/get_all_products_usecase.dart';
-import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_events.dart';
-import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_states.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {

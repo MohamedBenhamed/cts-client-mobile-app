@@ -164,9 +164,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      widget.product.name,
-                      style: Theme.of(context).textTheme.headlineMedium,
+                    // Wrap Text in Expanded to constrain width and allow wrapping
+                    Expanded(
+                      child: Text(
+                        widget.product.name,
+                        style: Theme.of(context).textTheme.headlineMedium,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
                     ),
                     IconButton(
                       onPressed: () {},
@@ -176,6 +181,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                     ),
                   ],
                 ),
+
                 SizedBox(height: 20),
                 Row(
                   children: [

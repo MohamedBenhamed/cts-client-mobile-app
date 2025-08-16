@@ -18,6 +18,7 @@ class GetAllProductsHeadersRemoteDataSource
       final response = await dioClient.get(ApiConstance.getProductsHeaders);
 
       if (response.statusCode == 200) {
+        print('Response data: ${response.data}');
         return (response.data as List)
             .map((e) => ProductheaderModel.fromJson(e as Map<String, dynamic>))
             .toList();
@@ -27,6 +28,7 @@ class GetAllProductsHeadersRemoteDataSource
         );
       }
     } catch (e) {
+      print('Response data:$e');
       throw Exception('Error fetching products headers data: $e');
     }
   }

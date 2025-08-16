@@ -1,126 +1,91 @@
+import 'package:estore_client/features/home/presentation/widgets/productCardWidget.dart';
 import '../../../../../generated/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:redacted/redacted.dart';
+import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_bloc.dart';
+import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_states.dart';
 
-Container newArrivalsContainer(BuildContext context) {
-  return Container(
-    key: Key('newArrivals'),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: Text(
-            S.of(context).NewArrivals,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-        ),
-        SizedBox(height: 10),
-        SizedBox(
-          height: 306, // Set a fixed height
-          width: MediaQuery.of(context).size.width, // Set a finite width
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              productCard(
-                context,
-                "Samsung",
-                "Samsung Galaxy S24 Ultra",
-                "7000 ${S.of(context).LYD}",
-                "assets/products/smartPhones/SamsungGalaxyS24Ultra.webp",
-              ).redacted(
-                context: context,
-                redact: false,
-                configuration: RedactedConfiguration(
-                  animationDuration: const Duration(
-                    milliseconds: 800,
-                  ), //default
-                ),
-              ),
-              productCard(
-                context,
-                "Apple",
-                "IPhone 16 Pro Max",
-                "7000 ${S.of(context).LYD}",
-                "assets/products/smartPhones/iPhone16-Pro-Max-DesertTitanium.webp",
-              ),
-            ],
-          ).redacted(
-            context: context,
-            redact: true,
-            configuration: RedactedConfiguration(
-              animationDuration: const Duration(milliseconds: 800), //default
+class NewArrivalsContainer extends StatelessWidget {
+  const NewArrivalsContainer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('newArrivals'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Text(
+              S.of(context).NewArrivals,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(height: 10),
 
-Widget productCard(
-  BuildContext context,
-  String brand,
-  String name,
-  String price,
-  String imagePath,
-) {
-  return InkWell(
-    onTap: () {},
-    child: Container(
-      width: 250, // Adjust as needed
-      margin: EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.deepOrange[100],
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Stack(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(imagePath, height: 165, fit: BoxFit.cover),
-                ),
-              ),
-              Container(
-                height: 125,
-                width: double.infinity,
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.deepOrange,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      brand,
-                      style: Theme.of(context).textTheme.displaySmall,
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      name,
-                      style: Theme.of(context).textTheme.displayMedium,
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      price,
-                      style: Theme.of(context).textTheme.displayMedium,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          // BlocBuilder for products
+          SizedBox(
+            height: 380,
+            width: MediaQuery.of(context).size.width,
+            child: BlocBuilder<ProductsBloc, GetAllProductsStates>(
+              builder: (context, state) {
+                if (state is GetAllProductsLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is GetAllProductsLoaded) {
+                  final products =
+                      List.from(state.products).where((p) {
+                          final discountValue =
+                              p.discount != null
+                                  ? double.tryParse(p.discount) ?? 0.0
+                                  : 0.0;
+                          return discountValue <= 0;
+                        }).toList()
+                        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+                  // Show horizontal scroll of ProductCards
+                  return ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    itemCount: products.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 10),
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      final stockStatus = context
+                          .read<ProductsBloc>()
+                          .getStockStatus(product);
+                      final priceInfo = context
+                          .read<ProductsBloc>()
+                          .getPriceInfo(product);
+
+                      return ProductCard(
+                        brand: product.brandName,
+                        name: product.name,
+                        price:
+                            "${priceInfo['discountedPrice']?.toInt()} ${S.of(context).LYD}",
+                        imagePath:
+                            product.images.isNotEmpty
+                                ? product.images[0]
+                                : "assets/placeholder.png",
+                      ).redacted(
+                        context: context,
+                        redact: false,
+                        configuration: RedactedConfiguration(
+                          animationDuration: Duration(milliseconds: 800),
+                        ),
+                      );
+                    },
+                  );
+                } else if (state is GetAllProductsError) {
+                  return const Center(child: Text("Failed to load products"));
+                }
+                return const Center(child: Text("No data available"));
+              },
+            ),
           ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }
