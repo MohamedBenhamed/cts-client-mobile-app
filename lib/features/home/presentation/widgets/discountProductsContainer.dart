@@ -1,10 +1,11 @@
+import 'package:estore_client/features/home/presentation/controllers/productsController/get_home_products_bloc.dart';
+import 'package:estore_client/features/home/presentation/controllers/productsController/get_home_products_states.dart';
+import 'package:estore_client/features/home/presentation/widgets/productCard.dart';
 import 'package:estore_client/features/home/presentation/widgets/productCardWidget.dart';
 import '../../../../../generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:redacted/redacted.dart';
-import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_bloc.dart';
-import 'package:estore_client/features/search/presentation/controllers/productsController/get_all_products_states.dart';
 
 Container discountProductsContainer(BuildContext context) {
   return Container(
@@ -23,9 +24,9 @@ Container discountProductsContainer(BuildContext context) {
         const SizedBox(height: 10),
         // BlocBuilder for products
         SizedBox(
-          height: 380,
+          height: 300,
           width: MediaQuery.of(context).size.width,
-          child: BlocBuilder<ProductsBloc, GetAllProductsStates>(
+          child: BlocBuilder<HomeProductsBloc, GetAllProductsStates>(
             builder: (context, state) {
               if (state is GetAllProductsLoading) {
                 return const Center(child: CircularProgressIndicator());
@@ -48,13 +49,13 @@ Container discountProductsContainer(BuildContext context) {
                   itemBuilder: (context, index) {
                     final product = products[index];
                     final stockStatus = context
-                        .read<ProductsBloc>()
+                        .read<HomeProductsBloc>()
                         .getStockStatus(product);
-                    final priceInfo = context.read<ProductsBloc>().getPriceInfo(
-                      product,
-                    );
+                    final priceInfo = context
+                        .read<HomeProductsBloc>()
+                        .getPriceInfo(product);
 
-                    return ProductCard(
+                    return NewProductCard(
                       brand: product.brandName,
                       name: product.name,
                       price:

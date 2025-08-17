@@ -1,11 +1,11 @@
-import 'package:estore_client/features/home/presentation/controllers/productsController/get_all_products_events.dart';
-import 'package:estore_client/features/home/presentation/controllers/productsController/get_all_products_states.dart';
+import 'package:estore_client/features/home/presentation/controllers/productsController/get_home_products_events.dart';
+import 'package:estore_client/features/home/presentation/controllers/productsController/get_home_products_states.dart';
 import 'package:estore_client/features/search/domain/entites/productsHeader.dart';
 import 'package:estore_client/features/search/domain/usecases/get_all_products_usecase.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {
+class HomeProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {
   final GetAllProductsUsecase getAllProductsUsecase;
 
   final List<Productsheader> _allProducts = [];
@@ -16,8 +16,9 @@ class ProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {
   int? _currentCategoryId;
   bool _onlyInStock = false;
 
-  ProductsBloc(this.getAllProductsUsecase) : super(GetAllProductsInitial()) {
-    on<LoadProducts>(_onLoadProducts);
+  HomeProductsBloc(this.getAllProductsUsecase)
+    : super(GetAllProductsInitial()) {
+    on<LoadHomeProducts>(_onLoadProducts);
     on<SearchProducts>(_onSearchProducts);
     on<FilterProducts>(_onFilterProducts);
     on<SearchFilteredProducts>(_onSearchFilteredProducts);
@@ -26,7 +27,7 @@ class ProductsBloc extends Bloc<ProductsEvent, GetAllProductsStates> {
 
   // 🚀 Load all products and apply filters if any
   Future<void> _onLoadProducts(
-    LoadProducts event,
+    LoadHomeProducts event,
     Emitter<GetAllProductsStates> emit,
   ) async {
     emit(GetAllProductsLoading());

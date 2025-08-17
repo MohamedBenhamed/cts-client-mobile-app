@@ -1,3 +1,4 @@
+import 'package:estore_client/features/home/presentation/widgets/productCard.dart';
 import 'package:estore_client/features/home/presentation/widgets/productCardWidget.dart';
 
 import '../../../../../generated/l10n.dart';
@@ -19,42 +20,10 @@ Container popularProductsContainer(BuildContext context) {
         ),
         SizedBox(height: 10),
         SizedBox(
-          height: 380, // Fixed height
+          height: 320, // Fixed height
           width: MediaQuery.of(context).size.width, // Constrained width
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              ProductCard(
-                brand: "Samsung",
-                name: "Samsung Galaxy S24 Ultra",
-                price: "7000 ${S.of(context).LYD}",
-                imagePath:
-                    "assets/products/smartPhones/SamsungGalaxyS24Ultra.webp",
-              ).redacted(
-                context: context,
-                redact: false,
-                configuration: RedactedConfiguration(
-                  animationDuration: const Duration(
-                    milliseconds: 800,
-                  ), //default
-                ),
-              ),
+          child: ListView(scrollDirection: Axis.horizontal, children: [
 
-              ProductCard(
-                brand: "Samsung",
-                name: "Samsung Galaxy S24 Ultra",
-                price: "7000 ${S.of(context).LYD}",
-                imagePath:
-                    "assets/products/smartPhones/SamsungGalaxyS24Ultra.webp",
-              ).redacted(
-                context: context,
-                redact: false,
-                configuration: RedactedConfiguration(
-                  animationDuration: const Duration(
-                    milliseconds: 800,
-                  ), //default
-                ),
-              ),
             ],
           ),
         ),

@@ -1,6 +1,6 @@
 abstract class ProductsEvent {}
 
-class LoadProducts extends ProductsEvent {}
+class LoadHomeProducts extends ProductsEvent {}
 
 class SearchProducts extends ProductsEvent {
   final String query;
