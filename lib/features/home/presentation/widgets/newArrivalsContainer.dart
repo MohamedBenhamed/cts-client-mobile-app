@@ -1,6 +1,6 @@
 import 'package:estore_client/features/home/presentation/controllers/productsController/get_home_products_bloc.dart';
 import 'package:estore_client/features/home/presentation/controllers/productsController/get_home_products_states.dart';
-import 'package:estore_client/features/home/presentation/widgets/productCardWidget.dart';
+import 'package:estore_client/features/home/presentation/widgets/productCard.dart';
 import '../../../../../generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +28,7 @@ class NewArrivalsContainer extends StatelessWidget {
 
           // BlocBuilder for products
           SizedBox(
-            height: 380,
+            height: 300,
             width: MediaQuery.of(context).size.width,
             child: BlocBuilder<HomeProductsBloc, GetAllProductsStates>(
               builder: (context, state) {
@@ -59,10 +59,12 @@ class NewArrivalsContainer extends StatelessWidget {
                           .read<HomeProductsBloc>()
                           .getPriceInfo(product);
 
-                      return ProductCard(
+                      return NewProductCard(
                         brand: product.brandName,
                         name: product.name,
                         price:
+                            "${priceInfo['originalPrice']?.toInt()} ${S.of(context).LYD}",
+                        discountedPrice:
                             "${priceInfo['discountedPrice']?.toInt()} ${S.of(context).LYD}",
                         imagePath:
                             product.images.isNotEmpty

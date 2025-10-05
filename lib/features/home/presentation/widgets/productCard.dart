@@ -61,28 +61,29 @@ class NewProductCard extends StatelessWidget {
                       height: 150, // 👈 still keeps it smaller
                     ),
                   ),
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        "$discountPercent% تخفيض",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                  if (discountPercent != null)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          "$discountPercent% تخفيض",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
                   const Positioned(
                     top: 8,
                     right: 8,
@@ -117,24 +118,48 @@ class NewProductCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Column(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        price,
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 14,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                      Text(
-                        discountedPrice!,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                      Column(
+                        children: [
+                          if (discountPercent != null)
+                            Text(
+                              price,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 14,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                          Text(
+                            discountedPrice!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(width: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: IconButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal,
+                          ).copyWith(
+                            backgroundColor: WidgetStateProperty.all(
+                              Colors.teal,
+                            ),
+                          ),
+                          onPressed: onAddToCart,
+                          icon: const Icon(
+                            Icons.add_shopping_cart,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
